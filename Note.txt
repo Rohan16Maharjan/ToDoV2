@@ -1,0 +1,7 @@
+1.Design
+2.Delete and Delete All: modal Component use
+
+The chakra old version(provider theme) and frame motion (open modal) gave a lot of issue.
+
+Got the is missing in props validation react/prop-types issue in the Modal Component so solution was:
+https://stackoverflow.com/questions/38684925/react-eslint-error-missing-in-props-validation
