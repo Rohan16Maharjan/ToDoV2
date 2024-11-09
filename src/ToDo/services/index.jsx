@@ -79,4 +79,39 @@ const useUpdateTodo = () => {
   });
 };
 
-export { useDeleteAll, useGetAllTodo, useCreate, useDeleteToDo, useUpdateTodo };
+// favourtie
+const favourite = (id) => {
+  return httpClient.post(api.favourite.replace('{id}', `${id}`));
+};
+
+const useFavourite = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: favourite,
+    onSuccess: () => {
+      queryClient.invalidateQueries([api.getfavourite]);
+    },
+  });
+};
+
+// getAllFavourite
+const getFavourite = () => {
+  return httpClient.get(api.getfavourite);
+};
+
+const useGetFavourite = () => {
+  return useQuery({
+    queryKey: [api.getfavourite],
+    queryFn: getFavourite,
+  });
+};
+
+export {
+  useDeleteAll,
+  useGetAllTodo,
+  useCreate,
+  useDeleteToDo,
+  useUpdateTodo,
+  useFavourite,
+  useGetFavourite,
+};

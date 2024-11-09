@@ -1,18 +1,28 @@
-import { Box, Button, Flex, Heading, useDisclosure } from '@chakra-ui/react';
+import {
+  Box,
+  CircularProgress,
+  Flex,
+  Heading,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { FaEdit, FaEye } from 'react-icons/fa';
-import { MdDelete } from 'react-icons/md';
+import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
+import { TodoSlug } from '../../constant/TodoSlug';
 import CustomModal from '../../utils/Modal';
 import {
   useCreate,
   useDeleteAll,
   useDeleteToDo,
+  useFavourite,
   useGetAllTodo,
+  useGetFavourite,
   useUpdateTodo,
 } from '../services';
-import { TodoSlug } from '../../constant/TodoSlug';
+
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import AllTask from '../components/AllTask';
+import FavouiteTask from '../components/FavouiteTask';
 
 const Todo = () => {
   const {
@@ -20,6 +30,7 @@ const Todo = () => {
     register,
     setValue,
     reset,
+    control,
     formState: { errors },
   } = useForm();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -29,7 +40,10 @@ const Todo = () => {
   const { mutate: add } = useCreate();
   const { mutate: del1 } = useDeleteToDo();
   const { mutate: upda } = useUpdateTodo();
+  const { mutate: fav } = useFavourite();
+  const { data: favData } = useGetFavourite();
 
+  // update
   const [taskId, setTaskId] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
 
@@ -53,6 +67,7 @@ const Todo = () => {
   }, [taskId, todoData, setValue, reset]);
 
   const onSubmit = (eg) => {
+    console.log('herrr', selectedData);
     const payload = {
       ...eg,
       status: selectedData?.value,
@@ -85,7 +100,6 @@ const Todo = () => {
   };
 
   const handleDelete = (id) => {
-    alert('Are you sure you want to delete it ?');
     del1(id);
   };
 
@@ -98,8 +112,12 @@ const Todo = () => {
     onOpen();
   };
 
+  const handleFav = (id) => {
+    fav(id);
+  };
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <CircularProgress isIndeterminate color="green.300" />;
   }
 
   return (
@@ -157,16 +175,35 @@ const Todo = () => {
 
         <Box m={5}>
           <label>Status</label>
-          <Select
-            className="basic-single"
-            classNamePrefix="select"
-            isLoading={isLoading}
-            name="color"
-            options={TodoSlug}
-            inputValue="" //prevent from writing the stuffs
-            value={selectedData}
-            onChange={setSelectedData}
+          <Controller
+            name="status"
+            control={control}
+            rules={{ required: 'Status is required' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={TodoSlug}
+                onChange={(selectedOption) => {
+                  setSelectedData(selectedOption);
+                  field.onChange(selectedOption);
+                }}
+                value={selectedData}
+              />
+            )}
           />
+          {errors.status && (
+            <span
+              style={{
+                fontSize: '0.875rem',
+                display: 'block',
+                textAlign: 'center',
+                marginTop: '0.25rem',
+                color: 'red',
+              }}
+            >
+              {errors.status.message}
+            </span>
+          )}
         </Box>
 
         <Flex justifyContent={'space-around'}>
@@ -190,62 +227,36 @@ const Todo = () => {
         </Flex>
       </form>
 
-      {/* Display Todo List */}
-      <ul>
-        {todoData?.data.map((item) => (
-          <li
-            key={item.id}
-            style={{
-              display: 'flex',
-              border: '1px solid black',
-              padding: '0.5rem',
-            }}
-          >
-            <Flex flexDirection={'column'}>
-              <Flex flexDirection={'column'}>
-                <label>Title</label>
-                {item?.title}
-              </Flex>
-              <Box>
-                <Flex flexDirection={'column'}>
-                  <label>Status</label>
-                  {item?.status}
-                </Flex>
-              </Box>
-              {/* <Box>
-                <Flex flexDirection={'column'}>
-                  <label>Favourite</label>
-                  {item?.favourite}
-                </Flex>
-              </Box> */}
-              <Box>
-                <Flex flexDirection={'column'}>
-                  <label>Description</label>
-                  {item?.description}
-                </Flex>
-              </Box>
-            </Flex>
-            <Flex alignItems={'center'}>
-              <button
-                style={{ border: 'none', marginRight: '1rem' }}
-                type="button"
-                onClick={() => handleEdit(item)}
-              >
-                <FaEdit style={{ cursor: 'pointer' }} />
-              </button>
+      <Tabs>
+        <TabList>
+          <Tab>All</Tab>
+          <Tab>Favourite</Tab>
+        </TabList>
 
-              <MdDelete
-                onClick={() => handleDelete(item?.id)}
-                style={{ cursor: 'pointer' }}
-              />
-
-              <Button mt={4} onClick={() => handleTask(item)}>
-                <FaEye style={{ cursor: 'pointer' }} />
-              </Button>
-            </Flex>
-          </li>
-        ))}
-      </ul>
+        <TabPanels>
+          <TabPanel>
+            <AllTask
+              todoData={todoData}
+              title={'Title'}
+              status={'Status'}
+              description={'Description'}
+              handleDelete={handleDelete}
+              handleEdit={handleEdit}
+              handleTask={handleTask}
+              handleFav={handleFav}
+            />
+          </TabPanel>
+          <TabPanel>
+            <FavouiteTask
+              favData={favData}
+              title={'Title'}
+              status={'Status'}
+              description={'Description'}
+              handleFav={handleFav}
+            />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
 
       <CustomModal
         heading={`View Task`}

@@ -4,4 +4,6 @@ export const api = {
   delete: '/todo-project/{id}',
   deleteAll: '/todo-project',
   getAll: '/todo-project',
+  favourite: '/todo-project/{id}',
+  getfavourite: '/todo-project/favorite',
 };
