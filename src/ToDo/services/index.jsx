@@ -106,6 +106,42 @@ const useGetFavourite = () => {
   });
 };
 
+// getAllPendingTask
+const getPending = () => {
+  return httpClient.get(api.getPending);
+};
+
+const useGetPending = () => {
+  return useQuery({
+    queryKey: [api.getPending],
+    queryFn: getPending,
+  });
+};
+
+// getAllCompleteTask
+const getComplete = () => {
+  return httpClient.get(api.getComplete);
+};
+
+const useGetComplete = () => {
+  return useQuery({
+    queryKey: [api.getComplete],
+    queryFn: getComplete,
+  });
+};
+
+// getAllProgressTask
+const getProgress = () => {
+  return httpClient.get(api.getProgress);
+};
+
+const useGetProgress = () => {
+  return useQuery({
+    queryKey: [api.getProgress],
+    queryFn: getProgress,
+  });
+};
+
 export {
   useDeleteAll,
   useGetAllTodo,
@@ -114,4 +150,7 @@ export {
   useUpdateTodo,
   useFavourite,
   useGetFavourite,
+  useGetPending,
+  useGetComplete,
+  useGetProgress,
 };

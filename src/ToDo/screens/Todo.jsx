@@ -16,13 +16,19 @@ import {
   useDeleteToDo,
   useFavourite,
   useGetAllTodo,
+  useGetComplete,
   useGetFavourite,
+  useGetPending,
+  useGetProgress,
   useUpdateTodo,
 } from '../services';
 
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import AllTask from '../components/AllTask';
 import FavouiteTask from '../components/FavouiteTask';
+import PendingTask from '../components/PendingTask';
+import ProgressTask from '../components/ProgressTask';
+import CompleteTask from '../components/CompleteTask';
 
 const Todo = () => {
   const {
@@ -42,6 +48,9 @@ const Todo = () => {
   const { mutate: upda } = useUpdateTodo();
   const { mutate: fav } = useFavourite();
   const { data: favData } = useGetFavourite();
+  const { data: comData } = useGetComplete();
+  const { data: penData } = useGetPending();
+  const { data: proData } = useGetProgress();
 
   // update
   const [taskId, setTaskId] = useState(null);
@@ -230,6 +239,9 @@ const Todo = () => {
       <Tabs>
         <TabList>
           <Tab>All</Tab>
+          <Tab>Pending</Tab>
+          <Tab>Complete</Tab>
+          <Tab>Progress</Tab>
           <Tab>Favourite</Tab>
         </TabList>
 
@@ -243,6 +255,33 @@ const Todo = () => {
               handleDelete={handleDelete}
               handleEdit={handleEdit}
               handleTask={handleTask}
+              handleFav={handleFav}
+            />
+          </TabPanel>
+          <TabPanel>
+            <PendingTask
+              penData={penData}
+              title={'Title'}
+              status={'Status'}
+              description={'Description'}
+              handleFav={handleFav}
+            />
+          </TabPanel>
+          <TabPanel>
+            <CompleteTask
+              comData={comData}
+              title={'Title'}
+              status={'Status'}
+              description={'Description'}
+              handleFav={handleFav}
+            />
+          </TabPanel>
+          <TabPanel>
+            <ProgressTask
+              proData={proData}
+              title={'Title'}
+              status={'Status'}
+              description={'Description'}
               handleFav={handleFav}
             />
           </TabPanel>
